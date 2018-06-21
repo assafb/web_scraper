@@ -36,12 +36,7 @@ class StoriesController extends Controller
             );
         }
         else{
-            return new JsonResponse(array
-                (
-                    "scrape_status" => "error",
-                    "id" => $id
-                )
-            );
+            return new Response("id doesn't exists");
         }
     }
 
@@ -55,6 +50,10 @@ class StoriesController extends Controller
             return new Response('missing URL parameter');
         $url = urldecode($url);
         $pageHTML = $this->getPageHtml($url);
+        if (is_null($pageHTML))
+        {
+            return new Response('Site is not reachable.');
+        }
         $canUrl = $this->getCanonicalUrl($pageHTML);
         // Canonical URL should be set in og:URL. if it missing we can't guaranty uniqueness.
         if (is_null($canUrl))
@@ -109,7 +108,11 @@ class StoriesController extends Controller
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-        return curl_exec($ch);
+        $html = curl_exec($ch);
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200){
+            return null;
+        }
+        return $html;
     }
 
     /**
