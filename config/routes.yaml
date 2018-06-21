@@ -1,0 +1,14 @@
+#index:
+#    path: /
+#    defaults: { _controller: 'App\Controller\DefaultController::index' }
+
+
+stories_post:
+    path:     /stories
+    controller: App\Controller\StoriesController::post
+
+stories_get:
+    path:     /stories/{id}
+    controller: App\Controller\StoriesController::get
+    requirements:
+            id: '\d+'
